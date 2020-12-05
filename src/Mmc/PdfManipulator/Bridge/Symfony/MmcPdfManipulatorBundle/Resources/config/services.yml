@@ -1,0 +1,42 @@
+services:
+
+    Mmc\PdfManipulator\Component\FileManager\FileManager:
+        alias: '@Mmc\PdfManipulator\Component\FileManager\LocalFileManager'
+
+    Mmc\PdfManipulator\Component\FileManager\FileManager:
+        class: Mmc\PdfManipulator\Component\FileManager\FileManager
+
+    Mmc\PdfManipulator\Component\Manipulator:
+        class: Mmc\PdfManipulator\Component\Manipulator
+        arguments:
+            - '@Mmc\PdfManipulator\Component\FileManager\FileManager'
+        tags:
+            - { name: 'mmc.processor.chain' }
+
+    Mmc\PdfManipulator\Component\Processor\RawProcessor:
+        class: Mmc\PdfManipulator\Component\Processor\RawProcessor
+        arguments:
+            - '@Mmc\PdfManipulator\Component\FileManager\FileManager'
+        tags:
+            - { name: 'Mmc\PdfManipulator\Component\Manipulator'}
+        public: false
+
+    Mmc\PdfManipulator\Component\Processor\SeparateProcessor:
+        class: Mmc\PdfManipulator\Component\Processor\SeparateProcessor
+        arguments:
+            - '%mmc_pdf_manipulator.pdfseparate_binary%'
+        calls:
+            - ['setFileManagerInterface', ['@Mmc\PdfManipulator\Component\FileManager\FileManager']]
+        tags:
+            - { name: 'Mmc\PdfManipulator\Component\Manipulator'}
+        public: false
+
+    Mmc\PdfManipulator\Component\Processor\UniteProcessor:
+        class: Mmc\PdfManipulator\Component\Processor\UniteProcessor
+        arguments:
+            - '%mmc_pdf_manipulator.pdfunite_binary%'
+        calls:
+            - ['setFileManagerInterface', ['@Mmc\PdfManipulator\Component\FileManager\FileManager']]
+        tags:
+            - { name: 'Mmc\PdfManipulator\Component\Manipulator'}
+        public: false
