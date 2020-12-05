@@ -1,0 +1,32 @@
+{
+    "name": "meuhmeuhconcept/pdf-manipulator",
+    "description": "Manipulate pdf file (merge, separate, convert...) with PHP (wrapper for poppler-utils)",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "jngermon",
+            "email": "jn.germon@meuhmeuhconcept.com"
+        }
+    ],
+    "require": {
+        "php": ">7.2.5",
+        "meuhmeuhconcept/processor": "^2.3",
+        "symfony/process": "^5.2"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^2.16",
+        "phpunit/phpunit": "^8.5"
+    },
+    "suggest": {
+
+    },
+    "autoload":     {
+        "psr-4": { "Mmc\\PdfManipulator\\": "src/Mmc/PdfManipulator" }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Mmc\\PdfManipulator\\Tests\\": "tests/Mmc/PdfManipulator"
+        }
+    }
+}
