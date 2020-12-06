@@ -4,13 +4,22 @@ namespace Mmc\PdfManipulator\Component\FileManager;
 
 interface FileManagerInterface
 {
-    protected function getFileContents($filename): string;
-    protected function putFileContents($filename, $content): int;
-    protected function fileExists($filename): bool;
-    protected function isFile($filename): bool;
-    protected function filesize($filename): int;
-    protected function unlink($filename): bool;
-    protected function isDir($filename): bool;
-    protected function mkdir($pathname): bool;
-    protected function isWritable($pathname): bool;
+    public function createTemporaryFile(string $extension = null): string;
+
+    public function prepareOutput(string $filename, bool $overwrite): void;
+
+    public function getFileContents(string $filename): string;
+
+    public function putFileContents(string $filename, string $content): int;
+
+    public function fileExists(string $filename): bool;
+
+    public function isFile(string $filename): bool;
+
+    public function filesize(string $filename): int;
+
+    //public function unlink(string $filename): bool;
+    //public function isDir(string $filename): bool;
+    //public function mkdir(string $pathname): bool;
+    //public function isWritable(string $pathname): bool;
 }

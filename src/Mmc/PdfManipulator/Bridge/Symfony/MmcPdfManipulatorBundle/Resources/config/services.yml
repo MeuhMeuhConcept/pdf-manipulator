@@ -1,42 +1,94 @@
 services:
 
-    Mmc\PdfManipulator\Component\FileManager\FileManager:
-        alias: '@Mmc\PdfManipulator\Component\FileManager\LocalFileManager'
+    Mmc\PdfManipulator\Component\FileManager\FileManagerInterface: '@Mmc\PdfManipulator\Component\FileManager\LocalFileManager'
 
-    Mmc\PdfManipulator\Component\FileManager\FileManager:
-        class: Mmc\PdfManipulator\Component\FileManager\FileManager
+    Mmc\PdfManipulator\Component\FileManager\LocalFileManager:
+        class: Mmc\PdfManipulator\Component\FileManager\LocalFileManager
+
+    Mmc\PdfManipulator\Component\Helper:
+        class: Mmc\PdfManipulator\Component\Helper
+        arguments:
+            - '@Mmc\PdfManipulator\Component\PageCounter\PageCounterInterface'
+
+    Mmc\PdfManipulator\Component\Info\Info:
+        class: Mmc\PdfManipulator\Component\Info\Info
+        arguments:
+            - '%mmc_pdf_manipulator.pdfinfo_binary%'
+            - '%mmc_pdf_manipulator.env%'
+        calls:
+            - ['setTimeout', ['%mmc_pdf_manipulator.process_timeout%']]
+
+    Mmc\PdfManipulator\Component\PageCounter\PageCounterInterface: '@Mmc\PdfManipulator\Component\PageCounter\ChainPageCounter'
+
+    Mmc\PdfManipulator\Component\PageCounter\ChainPageCounter:
+        class: Mmc\PdfManipulator\Component\PageCounter\ChainPageCounter
+        tags:
+            - { name: 'mmc.processor.chain' }
+
+    Mmc\PdfManipulator\Component\PageCounter\ExtractOnePageCounter:
+        class: Mmc\PdfManipulator\Component\PageCounter\ExtractOnePageCounter
+        tags:
+            - { name: 'Mmc\PdfManipulator\Component\PageCounter\ChainPageCounter'}
+        public: false
+
+    Mmc\PdfManipulator\Component\PageCounter\FilePageCounter:
+        class: Mmc\PdfManipulator\Component\PageCounter\FilePageCounter
+        arguments:
+            - '@Mmc\PdfManipulator\Component\Info\Info'
+        tags:
+            - { name: 'Mmc\PdfManipulator\Component\PageCounter\ChainPageCounter'}
+        public: false
+
+    Mmc\PdfManipulator\Component\PageCounter\MergePageCounter:
+        class: Mmc\PdfManipulator\Component\PageCounter\MergePageCounter
+        tags:
+            - { name: 'Mmc\PdfManipulator\Component\PageCounter\ChainPageCounter'}
+        public: false
+
+    Mmc\PdfManipulator\Component\PageCounter\RawPageCounter:
+        class: Mmc\PdfManipulator\Component\PageCounter\RawPageCounter
+        arguments:
+            - '@Mmc\PdfManipulator\Component\FileManager\FileManagerInterface'
+            - '@Mmc\PdfManipulator\Component\Info\Info'
+        tags:
+            - { name: 'Mmc\PdfManipulator\Component\PageCounter\ChainPageCounter'}
+        public: false
 
     Mmc\PdfManipulator\Component\Manipulator:
         class: Mmc\PdfManipulator\Component\Manipulator
         arguments:
-            - '@Mmc\PdfManipulator\Component\FileManager\FileManager'
+            - '@Mmc\PdfManipulator\Component\FileManager\FileManagerInterface'
         tags:
             - { name: 'mmc.processor.chain' }
 
     Mmc\PdfManipulator\Component\Processor\RawProcessor:
         class: Mmc\PdfManipulator\Component\Processor\RawProcessor
         arguments:
-            - '@Mmc\PdfManipulator\Component\FileManager\FileManager'
+            - '@Mmc\PdfManipulator\Component\FileManager\FileManagerInterface'
         tags:
             - { name: 'Mmc\PdfManipulator\Component\Manipulator'}
         public: false
 
-    Mmc\PdfManipulator\Component\Processor\SeparateProcessor:
-        class: Mmc\PdfManipulator\Component\Processor\SeparateProcessor
+    Mmc\PdfManipulator\Component\Processor\ExtractOneProcessor:
+        class: Mmc\PdfManipulator\Component\Processor\ExtractOneProcessor
         arguments:
             - '%mmc_pdf_manipulator.pdfseparate_binary%'
+            - '%mmc_pdf_manipulator.env%'
         calls:
-            - ['setFileManagerInterface', ['@Mmc\PdfManipulator\Component\FileManager\FileManager']]
+            - ['setFileManagerInterface', ['@Mmc\PdfManipulator\Component\FileManager\FileManagerInterface']]
+            - ['setTimeout', ['%mmc_pdf_manipulator.process_timeout%']]
         tags:
             - { name: 'Mmc\PdfManipulator\Component\Manipulator'}
         public: false
 
-    Mmc\PdfManipulator\Component\Processor\UniteProcessor:
-        class: Mmc\PdfManipulator\Component\Processor\UniteProcessor
+    Mmc\PdfManipulator\Component\Processor\MergeProcessor:
+        class: Mmc\PdfManipulator\Component\Processor\MergeProcessor
         arguments:
             - '%mmc_pdf_manipulator.pdfunite_binary%'
+            - '%mmc_pdf_manipulator.env%'
         calls:
-            - ['setFileManagerInterface', ['@Mmc\PdfManipulator\Component\FileManager\FileManager']]
+            - ['setFileManagerInterface', ['@Mmc\PdfManipulator\Component\FileManager\FileManagerInterface']]
+            - ['setTimeout', ['%mmc_pdf_manipulator.process_timeout%']]
         tags:
             - { name: 'Mmc\PdfManipulator\Component\Manipulator'}
         public: false

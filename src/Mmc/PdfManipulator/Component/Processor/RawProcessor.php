@@ -20,9 +20,9 @@ class RawProcessor extends AbstractProcessor
 
     protected function doProcess($request)
     {
-        $this->fileManager->putFileContents($reference->getFilename(), $reference->getContent());
+        $this->fileManager->putFileContents($request->getFilename(), $request->getContent());
 
-        $this->checkOutput($reference->getFilename());
+        $this->checkOutput($request->getFilename());
 
         return true;
     }

@@ -18,15 +18,15 @@
         "friendsofphp/php-cs-fixer": "^2.16",
         "phpunit/phpunit": "^8.5"
     },
-    "suggest": {
-
-    },
-    "autoload":     {
-        "psr-4": { "Mmc\\PdfManipulator\\": "src/Mmc/PdfManipulator" }
+    "suggest": {},
+    "autoload": {
+        "psr-4": {
+            "Mmc\\PdfManipulator\\": "src/Mmc/PdfManipulator"
+        }
     },
     "autoload-dev": {
         "psr-4": {
-            "Mmc\\PdfManipulator\\Tests\\": "tests/Mmc/PdfManipulator"
+            "Mmc\\PdfManipulator\\": "tests/Mmc/PdfManipulator"
         }
     }
 }

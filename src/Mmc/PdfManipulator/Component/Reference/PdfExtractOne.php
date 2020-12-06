@@ -2,22 +2,18 @@
 
 namespace Mmc\PdfManipulator\Component\Reference;
 
-class PdfSeparate extends AbstractPdf
+class PdfExtractOne extends AbstractPdf
 {
     protected $reference;
 
-    protected $from;
-
-    protected $to;
+    protected $page;
 
     public function __construct(
         Pdf $reference,
-        int $from = 1,
-        int $to = 0
+        int $page = 1
     ) {
         $this->reference = $reference;
-        $this->from = $from;
-        $this->to = $to;
+        $this->page = $page;
     }
 
     public function getReference(): Pdf
@@ -32,27 +28,20 @@ class PdfSeparate extends AbstractPdf
         return $this;
     }
 
-    public function getFrom(): int
+    public function getPage(): int
     {
-        return $this->from;
+        return $this->page;
     }
 
-    public function setFrom(int $from): self
+    public function setPage(int $page): self
     {
-        $this->from = $from;
+        $this->page = $page;
 
         return $this;
     }
 
-    public function getTo(): int
+    public function getDependencies(): array
     {
-        return $this->to;
-    }
-
-    public function setTo(int $to): self
-    {
-        $this->to = $to;
-
-        return $this;
+        return [$this->reference];
     }
 }

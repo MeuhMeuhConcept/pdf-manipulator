@@ -2,13 +2,13 @@
 
 namespace Mmc\PdfManipulator\Component\Reference;
 
-class PdfUnite extends AbstractPdf
+class PdfMerge extends AbstractPdf
 {
     protected $references;
 
     public function __construct()
     {
-        $this->reference = [];
+        $this->references = [];
     }
 
     public function addReference(Pdf $reference): self
@@ -22,6 +22,11 @@ class PdfUnite extends AbstractPdf
      * @return mixed
      */
     public function getReferences(): array
+    {
+        return $this->references;
+    }
+
+    public function getDependencies(): array
     {
         return $this->references;
     }

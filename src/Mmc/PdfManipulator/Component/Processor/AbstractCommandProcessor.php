@@ -2,15 +2,11 @@
 
 namespace Mmc\PdfManipulator\Component\Processor;
 
-use Mmc\PdfManipulator\Component\Exception;
+use Mmc\PdfManipulator\Component\CommandWrapper\CommandTrait;
 
 abstract class AbstractCommandProcessor extends AbstractProcessor
 {
-    protected $binary;
-
-    protected $env;
-
-    protected $timeout = false;
+    use CommandTrait;
 
     public function __construct(
         string $binary,
@@ -26,9 +22,9 @@ abstract class AbstractCommandProcessor extends AbstractProcessor
 
     protected function doProcess($request)
     {
-        $command = $this->getCommand($reference);
+        $command = $this->getCommand($request);
 
-        $this->logger->info(sprintf('Generate file "%s".', $reference->getFilename()), [
+        $this->logger->info(sprintf('Generate file "%s".', $request->getFilename()), [
             'command' => $command,
             'env' => $this->env,
             'timeout' => $this->timeout,
@@ -37,9 +33,9 @@ abstract class AbstractCommandProcessor extends AbstractProcessor
         try {
             list($status, $stdout, $stderr) = $this->executeCommand($command);
             $this->checkProcessStatus($status, $stdout, $stderr, $command);
-            $this->checkOutput($output, $command);
+            $this->checkOutput($request->getFilename());
         } catch (\Throwable $e) {
-            $this->logger->error(sprintf('An error happened while generating "%s".', $output), [
+            $this->logger->error(sprintf('An error happened while generating "%s".', $request->getFilename()), [
                 'command' => $command,
                 'status' => isset($status) ? $status : null,
                 'stdout' => isset($stdout) ? $stdout : null,
@@ -49,70 +45,12 @@ abstract class AbstractCommandProcessor extends AbstractProcessor
             throw $e;
         }
 
-        $this->logger->info(sprintf('File "%s" has been successfully generated.', $output), [
+        $this->logger->info(sprintf('File "%s" has been successfully generated.', $request->getFilename()), [
             'command' => $command,
             'stdout' => $stdout,
             'stderr' => $stderr,
         ]);
 
         return true;
-    }
-
-    /**
-     * Executes the given command via shell and returns the complete output as
-     * a string.
-     *
-     * @param string $command
-     *
-     * @return array(status, stdout, stderr)
-     */
-    protected function executeCommand($command)
-    {
-        $process = new Process($command, null, $this->env);
-
-        if (false !== $this->timeout) {
-            $process->setTimeout($this->timeout);
-        }
-
-        $process->run();
-
-        return [
-            $process->getExitCode(),
-            $process->getOutput(),
-            $process->getErrorOutput(),
-        ];
-    }
-
-    /**
-     * Checks the process return status.
-     *
-     * @param int    $status  The exit status code
-     * @param string $stdout  The stdout content
-     * @param string $stderr  The stderr content
-     * @param string $command The run command
-     *
-     * @throws \RuntimeException if the output file generation failed
-     */
-    protected function checkProcessStatus($status, $stdout, $stderr, $command): self
-    {
-        if (0 !== $status and '' !== $stderr) {
-            throw new Exception\RuntimeException(sprintf('The exit status code \'%s\' says something went wrong:'."\n".'stderr: "%s"'."\n".'stdout: "%s"'."\n".'command: %s.', $status, $stderr, $stdout, $command));
-        }
-
-        return $this;
-    }
-
-    public function setTimeout(int $timeout): self
-    {
-        $this->timeout = $timeout;
-
-        return $this;
-    }
-
-    public function setBinary(string $binary): self
-    {
-        $this->binary = $binary;
-
-        return $this;
     }
 }
