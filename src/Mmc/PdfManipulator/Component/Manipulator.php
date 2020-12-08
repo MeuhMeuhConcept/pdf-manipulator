@@ -53,7 +53,7 @@ class Manipulator extends ChainProcessor
         $response = $this->process($reference);
 
         if (ResponseStatusCode::INTERNAL_ERROR == $response->getStatusCode()) {
-            throw new Exception\RuntimeException($response->getOutput());
+            throw new Exception\RuntimeException($response->getOutput(), 0, $response->getOutput());
         }
 
         return $this;
